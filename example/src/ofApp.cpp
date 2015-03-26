@@ -1,5 +1,4 @@
 #include "ofApp.h"
-#include "ofxPythonCallBack.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -11,14 +10,8 @@ void ofApp::setup(){
 	// creating a System
 	GA_system = python.getObject("ofSystem","ofsystem")(ofxPythonObject::makeTuple() << TuioCursorEvents);
 
-	// RecognizerStick class
-	ofxPythonObject RecognizerStick = python.getObject("RecognizerStick","RecognizerStick");
-
-	ofxPythonCallBackEvent1Arg * cb = new ofxPythonCallBackEvent1Arg(newagentStick);
-	ofxPythonObject pcb = CallBack2Python(cb);
-	registerNewAgent = python.getObject("registerNewAgent","ofsystem");
-	registerNewAgent(GA_system,RecognizerStick,pcb);
-	ofAddListener(newagentStick,this,&ofApp::NewAgentStick);
+	// registering to RecognizerStick newAgent events
+	gestureagents.registerNewAgent(GA_system,"RecognizerStick",this,&ofApp::NewAgentStick);
 
 	lines.setMode(OF_PRIMITIVE_LINES);
 
@@ -36,11 +29,8 @@ void ofApp::draw(){
 
 void ofApp::NewAgentStick(ofxPythonObject & agent)
 {
-	ofxPythonObject registerEvent = python.getObject("registerEvent","ofsystem");
-	ofxPythonCallBackEvent1Arg * cb = new ofxPythonCallBackEvent1Arg(newStick);
-	ofxPythonObject pcb = CallBack2Python(cb);
-	registerEvent(agent.attr("newStick"),pcb);
-	ofAddListener(newStick,this,&ofApp::NewStick);
+	//we are interested on newStick events
+	gestureagents.registerEvent(agent,"newStick",this,&ofApp::NewStick);
 }
 
 
